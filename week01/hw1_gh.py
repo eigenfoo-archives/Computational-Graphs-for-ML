@@ -15,7 +15,7 @@ import tensorflow as tf
 from tqdm import tqdm
 
 NUM_DATAPOINTS = 50
-NUM_FEATURES = 3
+NUM_FEATURES = 4
 BATCH_SIZE = 10  # Batch size must evenly divide NUM_DATAPOINTS... sorry
 NUM_EPOCHS = 300
 
