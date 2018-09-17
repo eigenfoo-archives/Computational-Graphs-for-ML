@@ -30,18 +30,18 @@ labels = np.append(np.zeros(datapoints_per_class),
                    np.ones(datapoints_per_class))
 data, labels = shuffle(data, labels)
 
-data_batches = np.split(data, NUM_DATAPOINTS//BATCH_SIZE)
-label_batches = np.split(labels, NUM_DATAPOINTS//BATCH_SIZE)
+data_batches = np.split(data, NUM_DATAPOINTS // BATCH_SIZE)
+label_batches = np.split(labels, NUM_DATAPOINTS // BATCH_SIZE)
 data_batches = [x.reshape(x.shape[0], -1) for x in data_batches]
 label_batches = [y.reshape(y.shape[0], -1) for y in label_batches]
 
 # Train
 LAYER_1_DIM = 10
 LAYER_2_DIM = 10
-NUM_EPOCHS = 300
+NUM_EPOCHS = 1500
 
-x = tf.placeholder(tf.float32, [BATCH_SIZE, 2])
-y = tf.placeholder(tf.float32, [BATCH_SIZE, 1])
+x = tf.placeholder(tf.float32, [None, 2])
+y = tf.placeholder(tf.float32, [None, 1])
 
 W1 = tf.get_variable('W1', [2, LAYER_1_DIM], tf.float32,
                      tf.random_normal_initializer())
@@ -62,31 +62,36 @@ activation1 = tf.nn.relu(tf.matmul(x, W1) + b1)
 activation2 = tf.nn.relu(tf.matmul(activation1, W2) + b2)
 logits = tf.matmul(activation2, W3) + b3
 activation3 = tf.sigmoid(logits)
+clf = tf.round(activation3)
 
-lmbda = 0.01
-l2 = lmbda * tf.reduce_sum([tf.nn.l2_loss(v)
-                            for v in tf.trainable_variables()])
+lam = 0.001
+l2 = lam * tf.reduce_sum([tf.nn.l2_loss(v)
+                          for v in tf.trainable_variables()])
 loss = tf.losses.sigmoid_cross_entropy(y, logits) + l2
-optim = (tf.train.MomentumOptimizer(learning_rate=0.04, momentum=0.9)
+optim = (tf.train.GradientDescentOptimizer(learning_rate=0.05)
                  .minimize(loss))
+num_errs = tf.reduce_sum(tf.abs(y - clf))
 
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 for _ in range(NUM_EPOCHS):
     for data_batch, label_batch in zip(data_batches, label_batches):
         sess.run(optim, feed_dict={x: data_batch, y: label_batch})
-    loss_val = sess.run(loss, feed_dict={x: data_batch, y: label_batch})
-    print(loss_val)
+    loss_, num_errs_ = sess.run([loss, num_errs],
+                                feed_dict={x: data_batch, y: label_batch})
+    print(loss_, num_errs_)
 
 # Plot
+xx, yy = np.meshgrid(np.linspace(-20, 20), np.linspace(-20, 20))
+points = np.array(list(zip(xx.flatten(), yy.flatten())))
+zz = sess.run(activation3, feed_dict={x: points})
+zz = zz.reshape(xx.shape)
+plt.contourf(xx, yy, zz)
+
 plt.scatter(x1, y1, c='r')
 plt.scatter(x2, y2, c='b')
 
 plt.title('Spirals')
 plt.axis('equal')
 
-#plt.show()
-
-'''
-Attempting to find an approximate functional form for f:
-'''
+plt.show()
