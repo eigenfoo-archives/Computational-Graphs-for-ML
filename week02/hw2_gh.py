@@ -38,7 +38,7 @@ label_batches = [y.reshape(y.shape[0], -1) for y in label_batches]
 # Train
 LAYER_1_DIM = 10
 LAYER_2_DIM = 10
-NUM_EPOCHS = 1500
+NUM_EPOCHS = 2000
 
 x = tf.placeholder(tf.float32, [None, 2])
 y = tf.placeholder(tf.float32, [None, 1])
@@ -84,13 +84,14 @@ for _ in range(NUM_EPOCHS):
 # Plot
 xx, yy = np.meshgrid(np.linspace(-20, 20), np.linspace(-20, 20))
 points = np.array(list(zip(xx.flatten(), yy.flatten())))
-zz = sess.run(activation3, feed_dict={x: points})
-zz = zz.reshape(xx.shape)
+zz = sess.run(activation3, feed_dict={x: points}).reshape(xx.shape)
 plt.contourf(xx, yy, zz)
 
 plt.scatter(x1, y1, c='r')
 plt.scatter(x2, y2, c='b')
 
+plt.xlabel('x')
+plt.ylabel('y')
 plt.title('Spirals')
 plt.axis('equal')
 
