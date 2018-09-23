@@ -74,12 +74,12 @@ print('Number of parameters:', num_params)
 ''' Output
 Train on 50000 samples, validate on 10000 samples
 Epoch 1/2
-2018-09-22 20:27:21.275130: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
-50000/50000 [==============================] - 122s 2ms/step - loss: 0.5201 - acc: 0.8926 - val_loss: 0.2022 - val_acc: 0.9720
+2018-09-22 20:49:57.609976: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+50000/50000 [==============================] - 125s 2ms/step - loss: 0.5212 - acc: 0.8933 - val_loss: 0.2130 - val_acc: 0.9696
 Epoch 2/2
-50000/50000 [==============================] - 123s 2ms/step - loss: 0.2704 - acc: 0.9470 - val_loss: 0.1787 - val_acc: 0.9716
-10000/10000 [==============================] - 6s 601us/step
-Test loss: 0.169088743019
-Test accuracy: 0.9739
+50000/50000 [==============================] - 125s 2ms/step - loss: 0.2682 - acc: 0.9471 - val_loss: 0.1701 - val_acc: 0.9752
+10000/10000 [==============================] - 6s 625us/step
+Test loss: 0.164031094706
+Test accuracy: 0.9751
 Number of parameters: 1266475.0
 '''
