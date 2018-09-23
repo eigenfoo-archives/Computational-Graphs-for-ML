@@ -41,12 +41,12 @@ NUM_EPOCHS = 10
 activation = keras.activations.relu
 
 model = keras.Sequential()
-model.add(keras.layers.Conv2D(5, 14, activation=activation,
-                              strides=4))
-model.add(keras.layers.MaxPool2D(3))
+model.add(keras.layers.Conv2D(5, 5, activation=activation,
+                              strides=3))
+model.add(keras.layers.MaxPool2D(4))
 model.add(keras.layers.Dropout(0.25))
 model.add(keras.layers.Flatten())
-model.add(keras.layers.Dense(NUM_CLASSES, activation='softmax'))
+model.add(keras.layers.Dense(NUM_CLASSES, activation='softmax', use_bias=False))
 
 model.compile(loss=keras.losses.categorical_crossentropy,
               optimizer=keras.optimizers.Adam(),
@@ -69,28 +69,28 @@ print('Number of parameters:', num_params)
 ''' Output
 Train on 50000 samples, validate on 10000 samples
 Epoch 1/10
-2018-09-22 20:50:51.831604: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
-50000/50000 [==============================] - 6s 114us/step - loss: 1.6335 - acc: 0.4260 - val_loss: 1.1370 - val_acc: 0.7064
+2018-09-22 21:53:26.773677: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+50000/50000 [==============================] - 6s 114us/step - loss: 1.6963 - acc: 0.4042 - val_loss: 1.0029 - val_acc: 0.7349
 Epoch 2/10
-50000/50000 [==============================] - 6s 112us/step - loss: 1.3468 - acc: 0.5217 - val_loss: 0.9773 - val_acc: 0.7578
+50000/50000 [==============================] - 5s 108us/step - loss: 1.1864 - acc: 0.6001 - val_loss: 0.8231 - val_acc: 0.7835
 Epoch 3/10
-50000/50000 [==============================] - 6s 112us/step - loss: 1.2587 - acc: 0.5592 - val_loss: 0.8627 - val_acc: 0.7916
+50000/50000 [==============================] - 5s 110us/step - loss: 1.1098 - acc: 0.6269 - val_loss: 0.7607 - val_acc: 0.7949
 Epoch 4/10
-50000/50000 [==============================] - 6s 112us/step - loss: 1.2032 - acc: 0.5790 - val_loss: 0.8156 - val_acc: 0.7997
+50000/50000 [==============================] - 5s 109us/step - loss: 1.0720 - acc: 0.6413 - val_loss: 0.7385 - val_acc: 0.7979
 Epoch 5/10
-50000/50000 [==============================] - 6s 110us/step - loss: 1.1760 - acc: 0.5913 - val_loss: 0.8024 - val_acc: 0.7997
+50000/50000 [==============================] - 5s 109us/step - loss: 1.0592 - acc: 0.6452 - val_loss: 0.7168 - val_acc: 0.7999
 Epoch 6/10
-50000/50000 [==============================] - 6s 110us/step - loss: 1.1646 - acc: 0.5922 - val_loss: 0.7703 - val_acc: 0.8126
+50000/50000 [==============================] - 5s 110us/step - loss: 1.0444 - acc: 0.6505 - val_loss: 0.7102 - val_acc: 0.7992
 Epoch 7/10
-50000/50000 [==============================] - 6s 110us/step - loss: 1.1585 - acc: 0.5962 - val_loss: 0.7569 - val_acc: 0.8145
+50000/50000 [==============================] - 6s 110us/step - loss: 1.0355 - acc: 0.6546 - val_loss: 0.6986 - val_acc: 0.8031
 Epoch 8/10
-50000/50000 [==============================] - 6s 112us/step - loss: 1.1410 - acc: 0.6024 - val_loss: 0.7505 - val_acc: 0.8169
+50000/50000 [==============================] - 5s 109us/step - loss: 1.0228 - acc: 0.6568 - val_loss: 0.6891 - val_acc: 0.8042
 Epoch 9/10
-50000/50000 [==============================] - 6s 111us/step - loss: 1.1377 - acc: 0.6040 - val_loss: 0.7424 - val_acc: 0.8157
+50000/50000 [==============================] - 6s 112us/step - loss: 1.0181 - acc: 0.6609 - val_loss: 0.6911 - val_acc: 0.8045
 Epoch 10/10
-50000/50000 [==============================] - 6s 111us/step - loss: 1.1364 - acc: 0.6068 - val_loss: 0.7325 - val_acc: 0.8179
-10000/10000 [==============================] - 0s 35us/step
-Test loss: 0.734625018501
-Test accuracy: 0.8101
-Number of parameters: 3144.0
+50000/50000 [==============================] - 6s 114us/step - loss: 1.0247 - acc: 0.6604 - val_loss: 0.6926 - val_acc: 0.8085
+10000/10000 [==============================] - 0s 49us/step
+Test loss: 0.671688363457
+Test accuracy: 0.8189
+Number of parameters: 998.0
 '''
