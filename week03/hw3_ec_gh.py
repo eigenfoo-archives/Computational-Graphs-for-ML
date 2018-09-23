@@ -49,11 +49,13 @@ model.add(keras.layers.Conv2D(3, 5, activation=activation))
 model.add(keras.layers.MaxPool2D(5))
 model.add(keras.layers.Dropout(0.25))
 model.add(keras.layers.Flatten())
-model.add(keras.layers.Dense(NUM_CLASSES, activation='softmax', use_bias=False))
+model.add(keras.layers.Dense(NUM_CLASSES, activation='softmax',
+                             use_bias=False))
 
 model.compile(loss=keras.losses.categorical_crossentropy,
               optimizer=keras.optimizers.Adam(),
               metrics=['accuracy'])
+
 model.fit(x_train, y_train,
           batch_size=BATCH_SIZE,
           epochs=NUM_EPOCHS,
