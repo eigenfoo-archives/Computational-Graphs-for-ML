@@ -39,15 +39,14 @@ x_train, x_val, x_test = \
 
 # Hyperparameters
 BATCH_SIZE = 32
-NUM_EPOCHS = 8
+NUM_EPOCHS = 10
 
 # Create CNN using Keras API
 activation = keras.activations.relu
 
 model = keras.Sequential()
-model.add(keras.layers.Conv2D(3, 5, activation=activation))
+model.add(keras.layers.Conv2D(3, 3, activation=activation))
 model.add(keras.layers.MaxPool2D(5))
-model.add(keras.layers.Dropout(0.25))
 model.add(keras.layers.Flatten())
 model.add(keras.layers.Dense(NUM_CLASSES, activation='softmax',
                              use_bias=False))
@@ -71,26 +70,42 @@ print('Test accuracy:', acc)
 print('Number of parameters:', num_params)
 
 ''' Output
+/Users/george/miniconda3/lib/python3.6/importlib/_bootstrap.py:219: RuntimeWarning: compiletime version 3.5 of module 'tensorflow.python.framework.fast_tensor_util' does not match runtime version 3.6
+  return f(*args, **kwds)
 Train on 50000 samples, validate on 10000 samples
-Epoch 1/8
-2018-09-22 23:07:55.242510: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
-50000/50000 [==============================] - 8s 169us/step - loss: 1.8248 - acc: 0.3619 - val_loss: 1.1677 - val_acc: 0.7233
-Epoch 2/8
-50000/50000 [==============================] - 8s 169us/step - loss: 1.3431 - acc: 0.5451 - val_loss: 0.9330 - val_acc: 0.7678
-Epoch 3/8
-50000/50000 [==============================] - 7s 144us/step - loss: 1.2295 - acc: 0.5837 - val_loss: 0.8394 - val_acc: 0.7876
-Epoch 4/8
-50000/50000 [==============================] - 7s 137us/step - loss: 1.1758 - acc: 0.6036 - val_loss: 0.7799 - val_acc: 0.7997
-Epoch 5/8
-50000/50000 [==============================] - 7s 136us/step - loss: 1.1485 - acc: 0.6116 - val_loss: 0.7594 - val_acc: 0.8093
-Epoch 6/8
-50000/50000 [==============================] - 7s 140us/step - loss: 1.1237 - acc: 0.6192 - val_loss: 0.7379 - val_acc: 0.8150
-Epoch 7/8
-50000/50000 [==============================] - 7s 141us/step - loss: 1.1188 - acc: 0.6210 - val_loss: 0.7259 - val_acc: 0.8218
-Epoch 8/8
-50000/50000 [==============================] - 7s 140us/step - loss: 1.1012 - acc: 0.6292 - val_loss: 0.7054 - val_acc: 0.8185
-10000/10000 [==============================] - 1s 57us/step
-Test loss: 0.694395569706
-Test accuracy: 0.8176
-Number of parameters: 602.0
+Epoch 1/15
+2018-09-24 01:21:28.264911: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+50000/50000 [==============================] - 4s 77us/step - loss: 1.7132 - acc: 0.4231 - val_loss: 1.1554 - val_acc: 0.6233
+Epoch 2/15
+50000/50000 [==============================] - 4s 74us/step - loss: 1.0180 - acc: 0.6720 - val_loss: 0.8701 - val_acc: 0.7251
+Epoch 3/15
+50000/50000 [==============================] - 4s 74us/step - loss: 0.8522 - acc: 0.7259 - val_loss: 0.7714 - val_acc: 0.7526
+Epoch 4/15
+50000/50000 [==============================] - 4s 74us/step - loss: 0.7821 - acc: 0.7462 - val_loss: 0.7223 - val_acc: 0.7669
+Epoch 5/15
+50000/50000 [==============================] - 4s 72us/step - loss: 0.7440 - acc: 0.7565 - val_loss: 0.6926 - val_acc: 0.7734
+Epoch 6/15
+50000/50000 [==============================] - 4s 71us/step - loss: 0.7191 - acc: 0.7653 - val_loss: 0.6738 - val_acc: 0.7817
+Epoch 7/15
+50000/50000 [==============================] - 4s 75us/step - loss: 0.7024 - acc: 0.7702 - val_loss: 0.6655 - val_acc: 0.7840
+Epoch 8/15
+50000/50000 [==============================] - 4s 72us/step - loss: 0.6905 - acc: 0.7760 - val_loss: 0.6546 - val_acc: 0.7887
+Epoch 9/15
+50000/50000 [==============================] - 4s 73us/step - loss: 0.6814 - acc: 0.7780 - val_loss: 0.6422 - val_acc: 0.7941
+Epoch 10/15
+50000/50000 [==============================] - 4s 71us/step - loss: 0.6739 - acc: 0.7794 - val_loss: 0.6400 - val_acc: 0.7934
+Epoch 11/15
+50000/50000 [==============================] - 4s 71us/step - loss: 0.6682 - acc: 0.7824 - val_loss: 0.6325 - val_acc: 0.7958
+Epoch 12/15
+50000/50000 [==============================] - 4s 71us/step - loss: 0.6633 - acc: 0.7826 - val_loss: 0.6333 - val_acc: 0.7934
+Epoch 13/15
+50000/50000 [==============================] - 4s 72us/step - loss: 0.6598 - acc: 0.7841 - val_loss: 0.6308 - val_acc: 0.7967
+Epoch 14/15
+50000/50000 [==============================] - 4s 71us/step - loss: 0.6565 - acc: 0.7865 - val_loss: 0.6228 - val_acc: 0.7975
+Epoch 15/15
+50000/50000 [==============================] - 4s 71us/step - loss: 0.6540 - acc: 0.7872 - val_loss: 0.6200 - val_acc: 0.7983
+10000/10000 [==============================] - 0s 27us/step
+Test loss: 0.6101281370639801
+Test accuracy: 0.8052
+Number of parameters: 458.0
 '''
