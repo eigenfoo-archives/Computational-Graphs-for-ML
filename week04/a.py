@@ -48,9 +48,8 @@ def dense_layer(units, model=None):
 
 
 # Hyperparameters
-BATCH_SIZE = 32
-NUM_EPOCHS_ADAM = 30
-NUM_EPOCHS_SGD = 20
+BATCH_SIZE = 128
+NUM_EPOCHS_ADAM = 20
 
 model = keras.Sequential()
 
@@ -58,19 +57,17 @@ conv_layer(64, 3, model=model)
 conv_layer(128, 3, model=model)
 conv_layer(256, 3, model=model)
 conv_layer(512, 3, model=model)
+conv_layer(1024, 3, model=model)
 
 model.add(keras.layers.Flatten())
 
-dense_layer(2048, model=model)
-dense_layer(1024, model=model)
 dense_layer(512, model=model)
-dense_layer(256, model=model)
 
 model.add(keras.layers.Dense(10, activation=keras.activations.softmax))
 
 model.compile(loss=keras.losses.categorical_crossentropy,
               optimizer=keras.optimizers.Adam(),
-              metrics=['accuracy'])
+              metrics=['accuracy', 'top_k_categorical_accuracy'])
 
 model.fit(x_train, y_train,
           batch_size=BATCH_SIZE,
@@ -78,17 +75,8 @@ model.fit(x_train, y_train,
           verbose=1,
           validation_data=[x_val, y_val])
 
-model.compile(loss=keras.losses.categorical_crossentropy,
-              optimizer=keras.optimizers.SGD(),
-              metrics=['accuracy'])
-
-model.fit(x_train, y_train,
-          batch_size=BATCH_SIZE,
-          epochs=NUM_EPOCHS_SGD,
-          verbose=1,
-          validation_data=[x_val, y_val])
-
-loss, acc = model.evaluate(x_test, y_test, verbose=1)
+loss, acc, top5_acc = model.evaluate(x_test, y_test, verbose=1)
 
 print('Test loss:', loss)
 print('Test accuracy:', acc)
+print('Test top5 accuracy:', top5_acc)
