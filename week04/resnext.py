@@ -88,16 +88,22 @@ def resnext_module(input, output_dim, bottleneck_dim=4, cardinality=16):
 input = keras.layers.Input(shape=[32, 32, 3])
 
 # Initial convolutional and maxpool layer
-x = keras.layers.Conv2D(16, 5, strides=2, padding='same')(input)
+x = keras.layers.Conv2D(16, 5, padding='same')(input)
 x = keras.layers.BatchNormalization()(x)
 x = keras.layers.ReLU()(x)
-x = keras.layers.MaxPool2D(3, strides=2)(x)
+x = keras.layers.MaxPool2D(3)(x)
 
 x = resnext_module(x, 128)
 x = resnext_module(x, 128)
 x = keras.layers.MaxPooling2D(2)(x)
 x = resnext_module(x, 256)
 x = resnext_module(x, 256)
+x = keras.layers.MaxPooling2D(2)(x)
+x = resnext_module(x, 512)
+x = resnext_module(x, 512)
+x = keras.layers.MaxPooling2D(2)(x)
+x = resnext_module(x, 1024)
+x = resnext_module(x, 1024)
 
 x = keras.layers.GlobalAveragePooling2D()(x)
 x = keras.layers.Flatten()(x)
@@ -108,7 +114,7 @@ model = keras.models.Model(input, output)
 
 model.compile(loss=keras.losses.categorical_crossentropy,
               optimizer=keras.optimizers.Adam(),
-              metrics=['accuracy'])
+              metrics=['accuracy', 'top_k_categorical_accuracy'])
 
 model.fit(x_train, y_train,
           batch_size=BATCH_SIZE,
