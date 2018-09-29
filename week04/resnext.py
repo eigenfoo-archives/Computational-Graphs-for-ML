@@ -34,8 +34,8 @@ y_train, y_val, y_test = \
         [y_train, y_val, y_test])
 
 # Hyperparameters
-BATCH_SIZE = 32
-NUM_EPOCHS = 20
+BATCH_SIZE = 128
+NUM_EPOCHS = 25
 
 
 def resnext_module(input, output_dim, bottleneck_dim=4, cardinality=16):
@@ -108,6 +108,8 @@ x = resnext_module(x, 1024)
 x = keras.layers.GlobalAveragePooling2D()(x)
 x = keras.layers.Flatten()(x)
 
+x = keras.layers.Dense(512, activation=keras.activations.relu)(x)
+x = keras.layers.Dropout(0.2)(x)
 output = keras.layers.Dense(10, activation=keras.activations.softmax)(x)
 
 model = keras.models.Model(input, output)
@@ -122,7 +124,10 @@ model.fit(x_train, y_train,
           verbose=1,
           validation_data=[x_val, y_val])
 
-loss, acc = model.evaluate(x_test, y_test, verbose=1)
+model.save('resnext.h5')
+
+loss, acc, top_k_acc = model.evaluate(x_test, y_test, verbose=1)
 
 print('Test loss:', loss)
 print('Test accuracy:', acc)
+print('Test top5 accuracy:', top_k_acc)
