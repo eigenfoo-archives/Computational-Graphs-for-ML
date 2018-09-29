@@ -35,11 +35,10 @@ y_train, y_val, y_test = \
 
 # Hyperparameters
 BATCH_SIZE = 32
-NUM_EPOCHS = 1
-REGULARIZER = keras.regularizers.l2()
+NUM_EPOCHS = 20
 
 
-def resnext_module(input, bottleneck_dim, output_dim, cardinality=4):
+def resnext_module(input, output_dim, bottleneck_dim=4, cardinality=16):
     '''
     Adds a ResNeXt bottleneck module.
 
@@ -64,11 +63,11 @@ def resnext_module(input, bottleneck_dim, output_dim, cardinality=4):
 
     for c in range(cardinality):
         x = keras.layers.Conv2D(bottleneck_dim, 1, padding='same',
-                                use_bias=False, kernel_regularizer=REGULARIZER)(input)
+                                use_bias=False)(input)
         x = keras.layers.Conv2D(bottleneck_dim, 3, padding='same',
-                                use_bias=False, kernel_regularizer=REGULARIZER)(x)
+                                use_bias=False)(x)
         x = keras.layers.Conv2D(output_dim, 1, padding='same',
-                                use_bias=False, kernel_regularizer=REGULARIZER)(x)
+                                use_bias=False)(x)
         xfm_list.append(x)
 
     x = keras.layers.add(xfm_list)
@@ -89,15 +88,16 @@ def resnext_module(input, bottleneck_dim, output_dim, cardinality=4):
 input = keras.layers.Input(shape=[32, 32, 3])
 
 # Initial convolutional and maxpool layer
-x = keras.layers.Conv2D(16, 5, strides=2, padding='same', use_bias=False,
-                        kernel_regularizer=REGULARIZER)(input)
+x = keras.layers.Conv2D(16, 5, strides=2, padding='same')(input)
 x = keras.layers.BatchNormalization()(x)
-x = keras.layers.Activation('relu')(x)
+x = keras.layers.ReLU()(x)
 x = keras.layers.MaxPool2D(3, strides=2)(x)
 
-x = resnext_module(x, 4, 128)
-x = resnext_module(x, 4, 128)
-x = resnext_module(x, 4, 128)
+x = resnext_module(x, 128)
+x = resnext_module(x, 128)
+x = keras.layers.MaxPooling2D(2)(x)
+x = resnext_module(x, 256)
+x = resnext_module(x, 256)
 
 x = keras.layers.GlobalAveragePooling2D()(x)
 x = keras.layers.Flatten()(x)
