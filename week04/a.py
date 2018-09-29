@@ -33,29 +33,40 @@ y_train, y_val, y_test = \
     map(lambda y: keras.utils.to_categorical(y, NUM_CLASSES),
         [y_train, y_val, y_test])
 
+
+def conv_layer(filters, kernel_size, model=None):
+    model.add(keras.layers.Conv2D(filters, kernel_size, padding='same'))
+    model.add(keras.layers.MaxPool2D(2))
+    model.add(keras.layers.ReLU())
+    model.add(keras.layers.BatchNormalization())
+
+
+def dense_layer(units, model=None):
+    model.add(keras.layers.Dense(units))
+    model.add(keras.layers.ReLU())
+    model.add(keras.layers.BatchNormalization())
+
+
 # Hyperparameters
 BATCH_SIZE = 32
-NUM_EPOCHS = 2
-
-# Create CNN using Keras API
-activation = keras.activations.relu
-regularizer = keras.regularizers.l2(l=0.05)
+NUM_EPOCHS_ADAM = 30
+NUM_EPOCHS_SGD = 20
 
 model = keras.Sequential()
-model.add(keras.layers.Conv2D(32, 5, activation=activation,
-                              kernel_regularizer=regularizer))
-model.add(keras.layers.MaxPooling2D(3))
-model.add(keras.layers.Conv2D(64, 5, activation=activation,
-                              kernel_regularizer=regularizer))
-model.add(keras.layers.MaxPooling2D(3))
-model.add(keras.layers.Conv2D(128, 5, activation=activation,
-                              kernel_regularizer=regularizer))
-model.add(keras.layers.MaxPooling2D(3))
-model.add(keras.layers.Dropout(0.25))
+
+conv_layer(64, 3, model=model)
+conv_layer(128, 3, model=model)
+conv_layer(256, 3, model=model)
+conv_layer(512, 3, model=model)
+
 model.add(keras.layers.Flatten())
-model.add(keras.layers.Dense(256, activation=activation))
-model.add(keras.layers.Dropout(0.5))
-model.add(keras.layers.Dense(NUM_CLASSES, activation='softmax'))
+
+dense_layer(2048, model=model)
+dense_layer(1024, model=model)
+dense_layer(512, model=model)
+dense_layer(256, model=model)
+
+model.add(keras.layers.Dense(10, activation=keras.activations.softmax))
 
 model.compile(loss=keras.losses.categorical_crossentropy,
               optimizer=keras.optimizers.Adam(),
@@ -63,7 +74,17 @@ model.compile(loss=keras.losses.categorical_crossentropy,
 
 model.fit(x_train, y_train,
           batch_size=BATCH_SIZE,
-          epochs=NUM_EPOCHS,
+          epochs=NUM_EPOCHS_ADAM,
+          verbose=1,
+          validation_data=[x_val, y_val])
+
+model.compile(loss=keras.losses.categorical_crossentropy,
+              optimizer=keras.optimizers.SGD(),
+              metrics=['accuracy'])
+
+model.fit(x_train, y_train,
+          batch_size=BATCH_SIZE,
+          epochs=NUM_EPOCHS_SGD,
           verbose=1,
           validation_data=[x_val, y_val])
 
