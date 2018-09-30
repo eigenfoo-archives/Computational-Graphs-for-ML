@@ -8,22 +8,16 @@ Classify cifar100. Achieve a top-5 accuracy of 70%
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.datasets.cifar10 import load_data
+from tqdm import tqdm
 
 
+# Adapted from:
 # https://github.com/philipperemy/tensorflow-maxout/blob/master/maxout.py
-def max_out(inputs, num_units, axis=None):
+def max_out(inputs):
     shape = inputs.get_shape().as_list()
-    if shape[0] is None:
-        shape[0] = -1
-    if axis is None:  # Assume that channel is the last dimension
-        axis = -1
-    num_channels = shape[axis]
-    if num_channels % num_units:
-        raise ValueError('number of features({}) is not '
-                         'a multiple of num_units({})'.format(num_channels,
-                                                              num_units))
-    shape[axis] = num_units
-    shape += [num_channels // num_units]
+    shape[0] = -1
+    shape[-1] = shape[-1] // 2
+    shape += [2]
     outputs = tf.reduce_max(tf.reshape(inputs, shape), -1, keepdims=False)
     return outputs
 
@@ -55,37 +49,47 @@ x_train_batches = np.split(x_train, 400)
 y_train_batches = np.split(y_train, 400)
 
 # Hyperparameters
-NUM_EPOCHS = 1
-REGULARIZER = None  # keras.regularizers.l2(0.0)
+NUM_EPOCHS = 15
+REGULARIZER = tf.keras.regularizers.l2(1e-6)
 
 input = tf.placeholder(tf.float32, [None, 32, 32, 3])
 labels = tf.placeholder(tf.float32, [None, 10])
 
 x = tf.layers.conv2d(input, 64, 3, kernel_regularizer=REGULARIZER)
-x = max_out(x, 2)
+x = max_out(x)
 
 x = tf.layers.conv2d(x, 128, 3, kernel_regularizer=REGULARIZER)
-x = max_out(x, 2)
+x = max_out(x)
 
 x = tf.layers.conv2d(x, 256, 3, kernel_regularizer=REGULARIZER)
-x = max_out(x, 2)
+x = max_out(x)
 
 x = tf.layers.flatten(x)
-x = tf.layers.dense(x, 128, activation=tf.nn.relu)
+x = tf.layers.dense(x, 128, activation=max_out)
 logits = tf.layers.dense(x, NUM_CLASSES)
 output = tf.nn.softmax(logits)
 
+correct_prediction = tf.equal(tf.argmax(output, 1), tf.argmax(labels, 1))
+accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+
 loss = tf.losses.softmax_cross_entropy(labels, logits)
-accuracy = tf.metrics.accuracy(labels, output)
 train_step = tf.train.AdamOptimizer().minimize(loss)
 
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 
-for _ in range(NUM_EPOCHS):
-    for x_batch, y_batch in zip(x_train_batches, y_train_batches):
-        _, loss_ = sess.run([train_step, loss],
-                            feed_dict={input: x_batch, labels: y_batch})
-        print(loss_)
+saver = tf.train.Saver()
 
-# sess.run()
+for i in range(5, NUM_EPOCHS):
+    for x_batch, y_batch in tqdm(zip(x_train_batches, y_train_batches)):
+        sess.run(train_step, feed_dict={input: x_batch, labels: y_batch})
+
+    loss_, accuracy_ = sess.run([loss, accuracy],
+                                feed_dict={input: x_val, labels: y_val})
+
+    with open('metrics.txt', 'a') as f:
+        f.write('Epoch: {} '.format(i))
+        f.write('Loss: {} '.format(loss_))
+        f.write('Accuracy: {}\n'.format(accuracy_))
+
+    save_path = saver.save(sess, "./tmp/model{}.ckpt".format(i))
