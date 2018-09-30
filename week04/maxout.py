@@ -7,7 +7,7 @@ Classify cifar100. Achieve a top-5 accuracy of 70%
 
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.datasets.cifar100 import load_data
+from tensorflow.keras.datasets.cifar10 import load_data
 from tqdm import tqdm
 
 
@@ -27,7 +27,7 @@ np.random.seed(1618)
 tf.set_random_seed(1618)
 
 # Data parameters
-NUM_CLASSES = 100
+NUM_CLASSES = 10
 HEIGHT = 32
 WIDTH = 32
 NUM_CHANNELS = 3
@@ -74,7 +74,8 @@ logits = tf.layers.dense(x, NUM_CLASSES)
 output = tf.nn.softmax(logits)
 
 # Metrics
-accuracy = tf.keras.metrics.categorical_accuracy(labels, output)
+correct_prediction = tf.equal(tf.argmax(output, 1), tf.argmax(labels, 1))
+accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 top5_accuracy = tf.keras.metrics.top_k_categorical_accuracy(labels,
                                                             output, k=5)
 
@@ -85,15 +86,15 @@ train_step = tf.train.AdamOptimizer().minimize(loss)
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 
-LOGFILE = '100metrics.txt'
+LOGFILE = 'metrics.txt'
 saver = tf.train.Saver()
 
 for i in range(NUM_EPOCHS):
-    for j, x_batch, y_batch in tqdm(enumerate(zip(x_train_batches,
-                                                  y_train_batches))):
+    for j, (x_batch, y_batch) in tqdm(enumerate(zip(x_train_batches,
+                                                    y_train_batches))):
         if j % 40 == 0:
-            _, accuracy_, top5_accuracy = \
-                sess.run([train_step, accuracy, top5_accuracy],
+            _, loss_, accuracy_, top5_accuracy_ = \
+                sess.run([train_step, loss, accuracy, top5_accuracy],
                          feed_dict={input: x_batch, labels: y_batch})
             with open(LOGFILE, 'a') as f:
                 f.write('Minibatch: {}\t'.format(j))
@@ -115,4 +116,4 @@ for i in range(NUM_EPOCHS):
         f.write(80*'=')
         f.write('\n')
 
-    save_path = saver.save(sess, "./tmp/100model{}.ckpt".format(i))
+    save_path = saver.save(sess, "./tmp/model{}.ckpt".format(i))
