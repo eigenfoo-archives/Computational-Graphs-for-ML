@@ -1,5 +1,5 @@
 '''
-ECE471, Selecte Topics in Machine Learning - Assignment 4
+ECE471, Selected Topics in Machine Learning - Assignment 4
 Submit by Oct. 4, 10pm
 tldr: Classify cifar10. Acheive performance similar to the state of the art.
 Classify cifar100. Achieve a top-5 accuracy of 70%
@@ -11,7 +11,7 @@ from tensorflow.keras.datasets.cifar10 import load_data
 from tqdm import tqdm
 
 
-# Adapted from:
+# 2-unit maxout. Adapted from
 # https://github.com/philipperemy/tensorflow-maxout/blob/master/maxout.py
 def max_out(inputs):
     shape = inputs.get_shape().as_list()
@@ -53,7 +53,7 @@ NUM_EPOCHS = 15
 REGULARIZER = tf.keras.regularizers.l2(1e-6)
 
 input = tf.placeholder(tf.float32, [None, 32, 32, 3])
-labels = tf.placeholder(tf.float32, [None, 10])
+labels = tf.placeholder(tf.float32, [None, NUM_CLASSES])
 
 x = tf.layers.conv2d(input, 64, 3, kernel_regularizer=REGULARIZER)
 x = max_out(x)
@@ -72,6 +72,8 @@ output = tf.nn.softmax(logits)
 correct_prediction = tf.equal(tf.argmax(output, 1), tf.argmax(labels, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
+top5_accuracy = tf.keras.metrics.top_k_categorical_accuracy(labels, output, k=5)
+
 loss = tf.losses.softmax_cross_entropy(labels, logits)
 train_step = tf.train.AdamOptimizer().minimize(loss)
 
@@ -80,16 +82,18 @@ sess.run(tf.global_variables_initializer())
 
 saver = tf.train.Saver()
 
-for i in range(5, NUM_EPOCHS):
+for i in range(NUM_EPOCHS):
     for x_batch, y_batch in tqdm(zip(x_train_batches, y_train_batches)):
         sess.run(train_step, feed_dict={input: x_batch, labels: y_batch})
 
-    loss_, accuracy_ = sess.run([loss, accuracy],
-                                feed_dict={input: x_val, labels: y_val})
+    loss_, accuracy_, top5_accuracy_ = \
+        sess.run([loss, accuracy, top5_accuracy],
+                 feed_dict={input: x_val, labels: y_val})
 
     with open('metrics.txt', 'a') as f:
-        f.write('Epoch: {} '.format(i))
-        f.write('Loss: {} '.format(loss_))
-        f.write('Accuracy: {}\n'.format(accuracy_))
+        f.write('Epoch: {}\t'.format(i))
+        f.write('Loss: {}\t'.format(loss_))
+        f.write('Accuracy: {}\t'.format(accuracy_))
+        f.write('Top5 Accuracy: {}\n'.format(top5_accuracy_))
 
     save_path = saver.save(sess, "./tmp/model{}.ckpt".format(i))
