@@ -34,9 +34,20 @@ y_train, y_val, y_test = \
         [y_train, y_val, y_test])
 
 
-def conv_layer(filters, kernel_size, maxpool=False, dropout=False, padding='same', model=None):
-    model.add(keras.layers.Conv2D(filters, kernel_size, padding=padding,
-                                  activation='relu',
+# Adapted from
+# https://github.com/philipperemy/tensorflow-maxout/blob/master/maxout.py
+def maxout(inputs):
+    shape = inputs.get_shape().as_list()
+    shape[0] = -1
+    shape[-1] = shape[-1] // 2
+    shape += [2]
+    outputs = tf.reduce_max(tf.reshape(inputs, shape), -1, keepdims=False)
+    return outputs
+
+
+def conv_layer(filters, kernel_size, maxpool=False, dropout=False, model=None):
+    model.add(keras.layers.Conv2D(filters, kernel_size,
+                                  padding='same', activation=maxout,
                                   kernel_regularizer=tf.keras.regularizers.l2(5e-7)))
     if maxpool:
         model.add(keras.layers.MaxPool2D(maxpool))
@@ -87,7 +98,7 @@ print('Test accuracy:', acc)
 print('Test top5 accuracy:', top5_acc)
 
 ''' Output, omitting Keras logs.
-Test loss: 2.4782284130096435
-Test accuracy: 0.3829
-Test top5 accuracy: 0.7162
+Test loss: 2.1856466199874878
+Test accuracy: 0.4477
+Test top5 accuracy: 0.7614
 '''
