@@ -1,5 +1,5 @@
 '''
-ECE471, Selecte Topics in Machine Learning - Assignment 4
+ECE471, Selected Topics in Machine Learning - Assignment 4
 Submit by Oct. 4, 10pm
 tldr: Classify cifar10. Acheive performance similar to the state of the art.
 Classify cifar100. Achieve a top-5 accuracy of 70%
@@ -52,7 +52,7 @@ def conv_layer(filters, kernel_size, maxpool=False, dropout=False, model=None):
     if maxpool:
         model.add(keras.layers.MaxPool2D(maxpool))
     if dropout:
-        model.add(keras.layers.Dropout(0.3))
+        model.add(keras.layers.Dropout(0.5))
     model.add(keras.layers.BatchNormalization())
 
 
@@ -62,17 +62,17 @@ NUM_EPOCHS_ADAM = 20
 
 model = keras.Sequential()
 
-conv_layer(64, 3, model=model)
-conv_layer(64, 3, model=model)
-conv_layer(64, 3, maxpool=2, dropout=True, model=model)
-conv_layer(128, 3, model=model)
-conv_layer(128, 3, model=model)
-conv_layer(128, 3, maxpool=2, dropout=True, model=model)
-conv_layer(256, 1, model=model)
+conv_layer(96, 5, model=model)
+conv_layer(96, 5, model=model)
+conv_layer(96, 5, maxpool=2, dropout=True, model=model)
+conv_layer(192, 3, model=model)
+conv_layer(192, 3, model=model)
+conv_layer(192, 3, maxpool=2, dropout=True, model=model)
+conv_layer(192, 3, model=model)
+conv_layer(192, 1, model=model)
+conv_layer(10, 1, model=model)
 
 model.add(keras.layers.GlobalAveragePooling2D())
-
-model.add(keras.layers.Dense(256, activation=keras.activations.relu))
 model.add(keras.layers.Dense(NUM_CLASSES, activation=keras.activations.softmax))
 
 model.compile(loss=keras.losses.categorical_crossentropy,
