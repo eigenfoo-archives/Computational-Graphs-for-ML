@@ -1,5 +1,5 @@
 '''
-ECE471, Selecte Topics in Machine Learning - Assignment 4
+ECE471, Selected Topics in Machine Learning - Assignment 4
 Submit by Oct. 4, 10pm
 tldr: Classify cifar10. Acheive performance similar to the state of the art.
 Classify cifar100. Achieve a top-5 accuracy of 70%
@@ -52,7 +52,7 @@ def dense_layer(units, model=None):
 
 # Hyperparameters
 BATCH_SIZE = 128
-NUM_EPOCHS = 30
+NUM_EPOCHS = 15
 
 model = keras.Sequential()
 
@@ -66,7 +66,7 @@ conv_layer(256, 1, model=model)
 
 model.add(keras.layers.GlobalAveragePooling2D())
 
-model.add(keras.layers.Dense(256, activation=keras.activations.softmax))
+model.add(keras.layers.Dense(256, activation=keras.activations.relu))
 model.add(keras.layers.Dense(NUM_CLASSES, activation=keras.activations.softmax))
 
 # It looks like a high learning rate is key
