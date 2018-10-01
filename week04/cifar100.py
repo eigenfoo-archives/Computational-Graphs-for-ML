@@ -68,9 +68,7 @@ NUM_EPOCHS = 15
 model = keras.Sequential()
 
 conv_layer(64, 3, model=model)
-conv_layer(64, 3, model=model)
 conv_layer(64, 3, maxpool=2, dropout=True, model=model)
-conv_layer(128, 3, model=model)
 conv_layer(128, 3, model=model)
 conv_layer(128, 3, maxpool=2, dropout=True, model=model)
 conv_layer(256, 1, model=model)
