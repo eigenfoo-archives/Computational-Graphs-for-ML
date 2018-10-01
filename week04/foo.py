@@ -90,3 +90,9 @@ loss, acc, top5_acc = model.evaluate(x_test, y_test, verbose=1)
 print('Test loss:', loss)
 print('Test accuracy:', acc)
 print('Test top5 accuracy:', top5_acc)
+
+'''
+Test loss: 0.5570879477262497
+Test accuracy: 0.8323
+Test top5 accuracy: 0.9872
+'''
