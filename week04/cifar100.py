@@ -56,11 +56,6 @@ def conv_layer(filters, kernel_size, maxpool=False, dropout=False, model=None):
     model.add(keras.layers.BatchNormalization())
 
 
-def dense_layer(units, model=None):
-    model.add(keras.layers.Dense(units, activation='relu'))
-    model.add(keras.layers.BatchNormalization())
-
-
 # Hyperparameters
 BATCH_SIZE = 128
 NUM_EPOCHS = 15
