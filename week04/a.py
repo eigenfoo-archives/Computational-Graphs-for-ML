@@ -34,16 +34,25 @@ y_train, y_val, y_test = \
         [y_train, y_val, y_test])
 
 
-def conv_layer(filters, kernel_size, model=None):
-    model.add(keras.layers.Conv2D(filters, kernel_size, padding='same'))
-    model.add(keras.layers.MaxPool2D(2))
-    model.add(keras.layers.ReLU())
-    model.add(keras.layers.BatchNormalization())
+# Adapted from
+# https://github.com/philipperemy/tensorflow-maxout/blob/master/maxout.py
+def maxout(inputs):
+    shape = inputs.get_shape().as_list()
+    shape[0] = -1
+    shape[-1] = shape[-1] // 2
+    shape += [2]
+    outputs = tf.reduce_max(tf.reshape(inputs, shape), -1, keepdims=False)
+    return outputs
 
 
-def dense_layer(units, model=None):
-    model.add(keras.layers.Dense(units))
-    model.add(keras.layers.ReLU())
+def conv_layer(filters, kernel_size, maxpool=False, dropout=False, model=None):
+    model.add(keras.layers.Conv2D(filters, kernel_size,
+                                  padding='same', activation=maxout,
+                                  kernel_regularizer=tf.keras.regularizers.l2(5e-7)))
+    if maxpool:
+        model.add(keras.layers.MaxPool2D(maxpool))
+    if dropout:
+        model.add(keras.layers.Dropout(0.3))
     model.add(keras.layers.BatchNormalization())
 
 
@@ -54,16 +63,17 @@ NUM_EPOCHS_ADAM = 20
 model = keras.Sequential()
 
 conv_layer(64, 3, model=model)
+conv_layer(64, 3, model=model)
+conv_layer(64, 3, maxpool=2, dropout=True, model=model)
 conv_layer(128, 3, model=model)
-conv_layer(256, 3, model=model)
-conv_layer(512, 3, model=model)
-conv_layer(1024, 3, model=model)
+conv_layer(128, 3, model=model)
+conv_layer(128, 3, maxpool=2, dropout=True, model=model)
+conv_layer(256, 1, model=model)
 
-model.add(keras.layers.Flatten())
+model.add(keras.layers.GlobalAveragePooling2D())
 
-dense_layer(512, model=model)
-
-model.add(keras.layers.Dense(10, activation=keras.activations.softmax))
+model.add(keras.layers.Dense(256, activation=keras.activations.relu))
+model.add(keras.layers.Dense(NUM_CLASSES, activation=keras.activations.softmax))
 
 model.compile(loss=keras.losses.categorical_crossentropy,
               optimizer=keras.optimizers.Adam(),
