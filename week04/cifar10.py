@@ -59,12 +59,13 @@ def conv_layer(filters, kernel_size, maxpool=False, dropout=False, model=None):
 # Hyperparameters
 BATCH_SIZE = 128
 NUM_EPOCHS_ADAM = 20
+NUM_EPOCHS_SGD = 20
 
 model = keras.Sequential()
 
-conv_layer(96, 5, model=model)
-conv_layer(96, 5, model=model)
-conv_layer(96, 5, maxpool=2, dropout=True, model=model)
+conv_layer(96, 3, model=model)
+conv_layer(96, 3, model=model)
+conv_layer(96, 3, maxpool=2, dropout=True, model=model)
 conv_layer(192, 3, model=model)
 conv_layer(192, 3, model=model)
 conv_layer(192, 3, maxpool=2, dropout=True, model=model)
@@ -76,7 +77,7 @@ model.add(keras.layers.GlobalAveragePooling2D())
 model.add(keras.layers.Dense(NUM_CLASSES, activation=keras.activations.softmax))
 
 model.compile(loss=keras.losses.categorical_crossentropy,
-              optimizer=keras.optimizers.Adam(),
+              optimizer=keras.optimizers.Adam(lr=0.01),
               metrics=['accuracy', 'top_k_categorical_accuracy'])
 
 model.fit(x_train, y_train,
@@ -85,14 +86,19 @@ model.fit(x_train, y_train,
           verbose=1,
           validation_data=[x_val, y_val])
 
+model.compile(loss=keras.losses.categorical_crossentropy,
+              optimizer=keras.optimizers.SGD(lr=0.001,
+                                             momentum=True),
+              metrics=['accuracy', 'top_k_categorical_accuracy'])
+
+model.fit(x_train, y_train,
+          batch_size=BATCH_SIZE,
+          epochs=NUM_EPOCHS_SGD,
+          verbose=1,
+          validation_data=[x_val, y_val])
+
 loss, acc, top5_acc = model.evaluate(x_test, y_test, verbose=1)
 
 print('Test loss:', loss)
 print('Test accuracy:', acc)
 print('Test top5 accuracy:', top5_acc)
-
-'''
-Test loss: 0.5570879477262497
-Test accuracy: 0.8323
-Test top5 accuracy: 0.9872
-'''
