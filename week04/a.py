@@ -9,6 +9,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.datasets.cifar10 import load_data
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 # Fix seed
 np.random.seed(1618)
@@ -25,14 +26,31 @@ NUM_CHANNELS = 3
 (x_train, y_train), (x_val, y_val) = \
     (x_train[:40000], y_train[:40000]), (x_train[40000:], y_train[40000:])
 
+datagen_train = ImageDataGenerator(
+    featurewise_center=True,
+    zca_whitening=True,
+    rotation_range=10,
+    width_shift_range=0.1,
+    height_shift_range=0.1)
+datagen_train.fit(x_train)
+
+datagen_val = ImageDataGenerator(
+    featurewise_center=True,
+    zca_whitening=True)
+datagen_val.fit(x_val)
+
+datagen_test = ImageDataGenerator(
+    featurewise_center=True,
+    zca_whitening=True)
+datagen_test.fit(x_test)
+
 # Normalize and reshape data and labels
 x_train, x_val, x_test = \
-    map(lambda x: (x / 255.0).reshape([-1, HEIGHT, WIDTH, NUM_CHANNELS]),
+    map(lambda x: x.reshape([-1, HEIGHT, WIDTH, NUM_CHANNELS]),
         [x_train, x_val, x_test])
 y_train, y_val, y_test = \
     map(lambda y: keras.utils.to_categorical(y, NUM_CLASSES),
         [y_train, y_val, y_test])
-
 
 # Adapted from
 # https://github.com/philipperemy/tensorflow-maxout/blob/master/maxout.py
@@ -59,13 +77,16 @@ def conv_layer(filters, kernel_size, maxpool=False, dropout=False, model=None):
 # Hyperparameters
 BATCH_SIZE = 128
 NUM_EPOCHS_ADAM = 20
-NUM_EPOCHS_SGD = 20
+NUM_EPOCHS_SGD = 30
 
 model = keras.Sequential()
 
-conv_layer(96, 3, model=model)
-conv_layer(96, 3, model=model)
-conv_layer(96, 3, maxpool=2, dropout=True, model=model)
+model.add(keras.layers.Conv2D(96, 5,
+                              padding='same', activation=maxout,
+                              kernel_regularizer=tf.keras.regularizers.l2(5e-7),
+                              input_shape=[32, 32, 3]))
+conv_layer(96, 5, model=model)
+conv_layer(96, 5, maxpool=2, dropout=True, model=model)
 conv_layer(192, 3, model=model)
 conv_layer(192, 3, model=model)
 conv_layer(192, 3, maxpool=2, dropout=True, model=model)
@@ -80,24 +101,29 @@ model.compile(loss=keras.losses.categorical_crossentropy,
               optimizer=keras.optimizers.Adam(lr=0.01),
               metrics=['accuracy', 'top_k_categorical_accuracy'])
 
-model.fit(x_train, y_train,
-          batch_size=BATCH_SIZE,
-          epochs=NUM_EPOCHS_ADAM,
-          verbose=1,
-          validation_data=[x_val, y_val])
+model.fit_generator(datagen_train.flow(x_train, y_train,
+                                       batch_size=BATCH_SIZE),
+                    epochs=NUM_EPOCHS_ADAM,
+                    verbose=1,
+                    validation_data=datagen_val.flow(x_val, y_val,
+                                                     batch_size=BATCH_SIZE))
 
 model.compile(loss=keras.losses.categorical_crossentropy,
               optimizer=keras.optimizers.SGD(lr=0.001,
                                              momentum=True),
               metrics=['accuracy', 'top_k_categorical_accuracy'])
 
-model.fit(x_train, y_train,
-          batch_size=BATCH_SIZE,
-          epochs=NUM_EPOCHS_SGD,
-          verbose=1,
-          validation_data=[x_val, y_val])
+model.fit_generator(datagen_train.flow(x_train, y_train,
+                                       batch_size=BATCH_SIZE),
+                    epochs=NUM_EPOCHS_SGD,
+                    verbose=1,
+                    validation_data=datagen_val.flow(x_val, y_val,
+                                                     batch_size=BATCH_SIZE))
 
-loss, acc, top5_acc = model.evaluate(x_test, y_test, verbose=1)
+loss, acc, top5_acc = \
+    model.evaluate_generator(datagen_test.flow(x_test, y_test,
+                                               batch_size=BATCH_SIZE),
+                             verbose=1)
 
 print('Test loss:', loss)
 print('Test accuracy:', acc)
