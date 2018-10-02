@@ -36,20 +36,26 @@ datagen = ImageDataGenerator(rotation_range=0.1,
                              horizontal_flip=True)
 datagen.fit(x_train)
 
+
 # Hyperparameters
 BATCH_SIZE = 128
 NUM_EPOCHS = 200  # I feel bad about this...
 
 model = keras.Sequential()
 
-model.add(keras.layers.Conv2D(96, 3, activation='relu', padding='same', input_shape=[32, 32, 3]))
+# Idk if I can wrap this architecture with a function (DRY)
+# without making it less readable...
+model.add(keras.layers.Conv2D(96, 3, activation='relu', padding='same',
+                              input_shape=[32, 32, 3]))
 model.add(keras.layers.Conv2D(96, 3, activation='relu', padding='same'))
-model.add(keras.layers.Conv2D(96, 3, activation='relu', padding='same', strides=2))
+model.add(keras.layers.Conv2D(96, 3, activation='relu', padding='same',
+                              strides=2))
 model.add(keras.layers.Dropout(0.5))
 
 model.add(keras.layers.Conv2D(192, 3, activation='relu', padding='same'))
 model.add(keras.layers.Conv2D(192, 3, activation='relu', padding='same'))
-model.add(keras.layers.Conv2D(192, 3, activation='relu', padding='same', strides=2))
+model.add(keras.layers.Conv2D(192, 3, activation='relu', padding='same',
+                              strides=2))
 model.add(keras.layers.Dropout(0.5))
 
 model.add(keras.layers.Conv2D(192, 3, activation='relu', padding='same'))
