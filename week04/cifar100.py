@@ -20,10 +20,6 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.datasets.cifar100 import load_data
 
-# Fix seed
-np.random.seed(1618)
-tf.set_random_seed(1618)
-
 # Data parameters
 NUM_CLASSES = 100
 HEIGHT = 32
