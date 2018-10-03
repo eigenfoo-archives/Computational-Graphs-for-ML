@@ -1,2 +1,1 @@
-# cgml
-Computational Graphs for Machine Learning
+# Computational Graphs for Machine Learning
