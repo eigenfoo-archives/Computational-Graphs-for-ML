@@ -2,7 +2,18 @@
 ECE471, Selected Topics in Machine Learning - Assignment 4
 Submit by Oct. 4, 10pm
 tldr: Classify cifar10. Acheive performance similar to the state of the art.
-Classify cifar100. Achieve a top-5 accuracy of 70%
+Classify cifar100. Achieve a top-5 accuracy of 70%.
+
+The architecture is adapted from the AllConv net presented in this paper:
+    https://arxiv.org/pdf/1412.6806.pdf
+And some portions of code were modified from this GitHub repo:
+    https://github.com/MateLabs/All-Conv-Keras
+My contributions:
+    - Experimented with placement and probabilities of dropout layers (removed
+      the first dropout layer, contrary to paper).
+    - Experimented with optimizers (decided that SGD was still the best, but
+      used Nesterov momentum and a different learning rate, contrary to paper).
+    - Trained it for longer, contrary to GitHub repo.
 '''
 
 import numpy as np
@@ -43,8 +54,8 @@ NUM_EPOCHS = 200  # I feel bad about this...
 
 model = keras.Sequential()
 
-# Idk if I can wrap this architecture with a function (DRY)
-# without making it less readable...
+# Idk if I can wrap this architecture with a function (DRY) without making
+# it less readable... Notice the exceptions to the patterns.
 model.add(keras.layers.Conv2D(96, 3, activation='relu', padding='same',
                               input_shape=[32, 32, 3]))
 model.add(keras.layers.Conv2D(96, 3, activation='relu', padding='same'))
@@ -63,7 +74,8 @@ model.add(keras.layers.Conv2D(192, 1, activation='relu', padding='valid'))
 model.add(keras.layers.Conv2D(10, 1, activation='relu', padding='valid'))
 
 model.add(keras.layers.GlobalAveragePooling2D())
-model.add(keras.layers.Dense(NUM_CLASSES, activation=keras.activations.softmax))
+model.add(keras.layers.Dense(NUM_CLASSES,
+                             activation=keras.activations.softmax))
 
 model.compile(loss=keras.losses.categorical_crossentropy,
               optimizer=keras.optimizers.SGD(lr=0.01,

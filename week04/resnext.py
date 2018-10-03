@@ -1,10 +1,3 @@
-'''
-ECE471, Selected Topics in Machine Learning - Assignment 4
-Submit by Oct. 4, 10pm
-tldr: Classify cifar10. Acheive performance similar to the state of the art.
-Classify cifar100. Achieve a top-5 accuracy of 70%
-'''
-
 import numpy as np
 import tensorflow as tf
 from tensorflow import keras

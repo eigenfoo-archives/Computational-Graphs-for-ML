@@ -3,6 +3,16 @@ ECE471, Selected Topics in Machine Learning - Assignment 4
 Submit by Oct. 4, 10pm
 tldr: Classify cifar10. Acheive performance similar to the state of the art.
 Classify cifar100. Achieve a top-5 accuracy of 70%
+
+The architecture is inspired by the MaxOut paper:
+    http://proceedings.mlr.press/v28/goodfellow13.pdf
+Implementation of MaxOut is adapted from:
+    https://github.com/philipperemy/tensorflow-maxout/blob/master/maxout.py
+My contributions:
+    - Added maxpooling, dropout and batchnorm, contrary to original paper
+    - Added a dense layer, contrary to original paper
+    - Used Adam instead of SGD with annealed learning rate, contrary to
+      original paper
 '''
 
 import numpy as np
@@ -46,9 +56,13 @@ def maxout(inputs):
 
 
 def conv_layer(filters, kernel_size, maxpool=False, dropout=False, model=None):
-    model.add(keras.layers.Conv2D(filters, kernel_size,
-                                  padding='same', activation=maxout,
-                                  kernel_regularizer=tf.keras.regularizers.l2(5e-7)))
+    model.add(keras.layers.Conv2D(
+        filters,
+        kernel_size,
+        padding='same',
+        activation=maxout,
+        kernel_regularizer=tf.keras.regularizers.l2(5e-7)
+    ))
     if maxpool:
         model.add(keras.layers.MaxPool2D(maxpool))
     if dropout:
@@ -71,7 +85,8 @@ conv_layer(256, 1, model=model)
 model.add(keras.layers.GlobalAveragePooling2D())
 
 model.add(keras.layers.Dense(256, activation=keras.activations.relu))
-model.add(keras.layers.Dense(NUM_CLASSES, activation=keras.activations.softmax))
+model.add(keras.layers.Dense(NUM_CLASSES,
+                             activation=keras.activations.softmax))
 
 # It looks like a high learning rate is key
 model.compile(loss=keras.losses.categorical_crossentropy,
