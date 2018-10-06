@@ -52,10 +52,12 @@ def load_data():
     # Data 1-indexes, Keras 0-indexes
     y_test = to_categorical(test.label - 1)
 
-    return (x_train, y_train), (x_val, y_val), (x_test, y_test), vocab_size, sequence_length
+    return (x_train, y_train), (x_val, y_val), (x_test, y_test), \
+        vocab_size, sequence_length
 
 
-(x_train, y_train), (x_val, y_val), (x_test, y_test), vocab_size, sequence_length = load_data()
+(x_train, y_train), (x_val, y_val), (x_test, y_test), \
+    vocab_size, sequence_length = load_data()
 
 model = keras.Sequential()
 
@@ -91,17 +93,7 @@ model.summary()
 
 model.fit(x_train, y_train,
           batch_size=BATCH_SIZE,
-          epochs=8,
-          verbose=1,
-          validation_data=[x_val, y_val])
-
-model.compile(loss=keras.losses.categorical_crossentropy,
-              optimizer=keras.optimizers.SGD(),
-              metrics=['accuracy'])
-
-model.fit(x_train, y_train,
-          batch_size=BATCH_SIZE,
-          epochs=5,
+          epochs=10,
           verbose=1,
           validation_data=[x_val, y_val])
 
