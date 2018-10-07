@@ -56,6 +56,9 @@ def load_data():
         vocab_size, sequence_length
 
 
+np.random.seed(1618)
+tf.set_random_seed(1618)
+
 (x_train, y_train), (x_val, y_val), (x_test, y_test), \
     vocab_size, sequence_length = load_data()
 
@@ -93,7 +96,7 @@ model.summary()
 
 model.fit(x_train, y_train,
           batch_size=BATCH_SIZE,
-          epochs=10,
+          epochs=NUM_EPOCHS,
           verbose=1,
           validation_data=[x_val, y_val])
 
@@ -101,3 +104,8 @@ loss, acc = model.evaluate(x_test, y_test, verbose=1)
 
 print('Test loss:', loss)
 print('Test accuracy:', acc)
+
+''' Output, omitting Keras logs.
+Test loss: 0.44504650415558566
+Test accuracy: 0.885
+'''
